@@ -1,0 +1,27 @@
+{
+    "manifest_version" : 3,
+    "name" : "Gesture AI App",
+    "version" : "1.0",
+    "description" : "Control browser with gestures. (Gesture recognition by AI.)",
+    "permissions" : ["commands", "activeTab", "scripting"],
+    "background": {
+        "service_worker": "background.js"
+      },
+
+    "commands" : {
+      "activate_recognition": {
+        "suggested_key": {
+          "default" : "Shift+Alt+G"
+        },
+        "description" : "Activate Recognition"
+      }
+    },
+
+    "web_accessible_resources" : [
+      {
+        "resources" : ["model.js", "gesture_model.json"],
+        "matches" : ["<all_urls>"]
+      }
+    ]
+  }
+  
