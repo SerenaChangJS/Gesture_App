@@ -19,7 +19,7 @@
 
     "web_accessible_resources" : [
       {
-        "resources" : ["model.js", "gesture_model.json"],
+        "resources" : ["model.js"],
         "matches" : ["<all_urls>"]
       }
     ]

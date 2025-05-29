@@ -59,7 +59,6 @@ if (!document.getElementById("gesture_canvas")) {
         console.log("Start classification");
 
         const features = extractFeatures(points);
-        // const model = await(await (fetch(chrome.runtime.getURL("gesture_model.json")))).json();
         const gesture = model_classify(features);
 
         console.log("Classification finished : ", gesture)
