@@ -1,3 +1,10 @@
+if (typeof window.zoomed === 'undefined') {
+    window.zoomed = false;
+}
+if (typeof window.reader === 'undefined') {
+    window.reader = false;
+}
+
 if (!document.getElementById("gesture_canvas")) {
     let canvas = document.createElement('canvas');
     canvas.id = "gesture_canvas";
@@ -23,11 +30,14 @@ if (!document.getElementById("gesture_canvas")) {
     let drawing = false;
     let points = [];
 
-    // escape key = exit/cancel + stop speech
+    // escape key = cancel all actions (zoom, speaking, reader)
     document.addEventListener("keydown", (e) =>{
         if (e.key === "Escape") {
             if (speechSynthesis.speaking) speechSynthesis.cancel();
             document.body.style.zoom = "100%";
+            if (window.reader) deactivate_reader();
+            window.reader = false;
+            window.zoomed = false;
             cleanup();
             console.log("Stopped speaking and cleaned up");
         }
@@ -71,25 +81,44 @@ if (!document.getElementById("gesture_canvas")) {
     function browser_action(gesture){
         switch(gesture){
             case 'o':
+                if (window.zoomed){
+                    document.body.style.zoom = "100%";
+                    console.log("Zoomed out");
+                    window.zoomed = false;
+                    break;
+                }
                 document.body.style.zoom = "120%";
                 console.log("Zoomed in");
+                window.zoomed = true;
                 break;
             case ']' : 
+                if (speechSynthesis.speaking) {
+                    speechSynthesis.cancel();
+                    console.log("Stopped speaking");
+                    break;
+                }
                 const message = new SpeechSynthesisUtterance(document.body.innerText.slice(0,1000));
                 speechSynthesis.speak(message);
                 console.log("Start speaking");
                 break;
             case '[' : 
+                if (window.reader) {
+                    deactivate_reader();
+                    console.log("Reader mode deactivated");
+                    window.reader = false;
+                    break;
+                }
                 reader_mode();
-                console.log("Reader mode activated.");
+                console.log("Reader mode activated");
+                window.reader = true;
                 break;
             default : 
                 console.log("Error : Unknown gesture - ", gesture);
         }
     }
 
+    // activated reader mode
     function reader_mode() {
-
         const selectors = ['article', 'main', '#content', '.content'];
         let mainContent = null;
     
@@ -126,6 +155,11 @@ if (!document.getElementById("gesture_canvas")) {
             padding: '2em',
             boxShadow: '0 0 10px rgba(0,0,0,0.1)',
         });
+    }
+
+    // deactivate reader mode
+    function deactivate_reader() {
+        location.reload();
     }
     
     // close canvas
