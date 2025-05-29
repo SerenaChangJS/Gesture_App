@@ -72,29 +72,11 @@ function extractFeatures (coords){
     ];
 }
 
-function model_classify(input, model, k=3){
-    const {X_train, y_train, features} = model;
-
-    console.log(X_train, y_train, features);
-    console.log(input);
-
-    if (!X_train || !y_train || !features) {
-        console.error("Error : model_classify (invalid structure)")
-        return null;
-    }
-
-    const input_map = features.map(i => input[i]);
-
-    const dists = X_train.map((sample, i) =>{
-        const sample_map = features.map(j=>sample[j]);
-        const dist = Math.sqrt(sample_map.reduce((acc, val, j) => acc + (val - input_map[j]) ** 2, 0));
-        return {label : y_train[i], dist};
-    })
-
-    dists.sort((a,b) => a.dist - b.dist);
-    const best = dists.slice(0,k);
-    const count = {};
-    best.forEach(c=>{count[c.label] = (count[c.label] || 0) + 1});
-
-    return Object.entries(count).sort((a,b) => b[1] - a[1])[0][0];
+function model_classify(input, k=3){
+    selected_feature = [1, 3, 4, 5, 7] // got from DecisionTree.py's output
+    selected_extracted_feature = []
+    selected_feature.forEach((i) =>{
+        selected_extracted_feature.push(input[i]);
+    });
+    return classification(selected_extracted_feature);
 }

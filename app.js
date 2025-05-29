@@ -22,14 +22,12 @@ if (!document.getElementById("gesture_canvas")) {
 
     let drawing = false;
     let points = [];
-    let reader = false;
-    let originalStyle = null;
-    let zoomed = false;
 
     // escape key = exit/cancel + stop speech
     document.addEventListener("keydown", (e) =>{
         if (e.key === "Escape") {
             if (speechSynthesis.speaking) speechSynthesis.cancel();
+            document.body.style.zoom = "100%";
             cleanup();
             console.log("Stopped speaking and cleaned up");
         }
@@ -61,8 +59,8 @@ if (!document.getElementById("gesture_canvas")) {
         console.log("Start classification");
 
         const features = extractFeatures(points);
-        const model = await(await (fetch(chrome.runtime.getURL("gesture_model.json")))).json();
-        const gesture = model_classify(features, model);
+        // const model = await(await (fetch(chrome.runtime.getURL("gesture_model.json")))).json();
+        const gesture = model_classify(features);
 
         console.log("Classification finished : ", gesture)
 
@@ -74,18 +72,8 @@ if (!document.getElementById("gesture_canvas")) {
     function browser_action(gesture){
         switch(gesture){
             case 'o':
-                console.log(zoomed);
-                if (!zoomed) {
-                    document.body.style.zoom = "120%";
-                    console.log("Zoomed in");
-                    zoomed = true;
-                }
-                else {
-                    document.body.style.zoom = "100%";
-                    console.log("Zoomed out");
-                    zoomed = false;
-                }
-                console.log(zoomed);
+                document.body.style.zoom = "120%";
+                console.log("Zoomed in");
                 break;
             case ']' : 
                 const message = new SpeechSynthesisUtterance(document.body.innerText.slice(0,1000));
@@ -93,16 +81,8 @@ if (!document.getElementById("gesture_canvas")) {
                 console.log("Start speaking");
                 break;
             case '[' : 
-                if (!reader) {
-                    reader_mode();
-                    console.log("Reader mode activated");
-                    reader = true;
-                }
-                else {
-                    document.replaceChild(originalStyle, document.documentElement);
-                    console.log("Reader mode deactivated");
-                    reader = false;
-                }
+                reader_mode();
+                console.log("Reader mode activated.");
                 break;
             default : 
                 console.log("Error : Unknown gesture - ", gesture);
@@ -110,8 +90,6 @@ if (!document.getElementById("gesture_canvas")) {
     }
 
     function reader_mode() {
-
-        originalStyle = document.document.cloneNode(true);
 
         const selectors = ['article', 'main', '#content', '.content'];
         let mainContent = null;
@@ -149,9 +127,6 @@ if (!document.getElementById("gesture_canvas")) {
             padding: '2em',
             boxShadow: '0 0 10px rgba(0,0,0,0.1)',
         });
-    
-        reader = true;
-        console.log("Reader mode activated.");
     }
     
     // close canvas

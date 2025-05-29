@@ -3,7 +3,7 @@ chrome.commands.onCommand.addListener((command) => {
         chrome.tabs.query({active : true, currentWindow : true}, ([tab]) => {
             chrome.scripting.executeScript({
                 target : {tabId : tab.id}, 
-                files : ["model.js", "app.js"]
+                files : ["model.js", "app.js", "tree_classification.js"]
             });
         });
     }
