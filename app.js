@@ -80,7 +80,7 @@ else if (!document.getElementById("gesture_canvas")) {
             cleanup();
         }
         else {
-            console.log("Too little data points", gesture)
+            console.log("Too little data points")
             cleanup();
         }
     });
