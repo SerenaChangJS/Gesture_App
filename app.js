@@ -5,7 +5,10 @@ if (typeof window.reader === 'undefined') {
     window.reader = false;
 }
 
-if (!document.getElementById("gesture_canvas")) {
+if (window.reader) {
+    show_feedback('none', "Exit Reader Mode to Reopen Canvas");
+} 
+else if (!document.getElementById("gesture_canvas")) {
     let canvas = document.createElement('canvas');
     canvas.id = "gesture_canvas";
 
@@ -40,6 +43,7 @@ if (!document.getElementById("gesture_canvas")) {
             window.zoomed = false;
             cleanup();
             console.log("Stopped speaking and cleaned up");
+            show_feedback('none', "Escape Key Clicked -> Cancels All Actions");
         }
     });
 
@@ -68,13 +72,17 @@ if (!document.getElementById("gesture_canvas")) {
         console.log("Stop drawing");
         console.log("Start classification");
 
-        const features = extractFeatures(points);
-        const gesture = model_classify(features);
-
-        console.log("Classification finished : ", gesture)
-
-        browser_action(gesture);
-        cleanup();
+        if (points.length>5) {
+            const features = extractFeatures(points);
+            const gesture = model_classify(features);
+            console.log("Classification finished : ", gesture);
+            browser_action(gesture);
+            cleanup();
+        }
+        else {
+            console.log("Too little data points", gesture)
+            cleanup();
+        }
     });
 
     // gesture function
@@ -84,32 +92,38 @@ if (!document.getElementById("gesture_canvas")) {
                 if (window.zoomed){
                     document.body.style.zoom = "100%";
                     console.log("Zoomed out");
+                    show_feedback(gesture, "Zoomed Out");
                     window.zoomed = false;
                     break;
                 }
                 document.body.style.zoom = "120%";
                 console.log("Zoomed in");
+                show_feedback(gesture, "Zoomed In");
                 window.zoomed = true;
                 break;
             case ']' : 
                 if (speechSynthesis.speaking) {
                     speechSynthesis.cancel();
                     console.log("Stopped speaking");
+                    show_feedback(gesture, "Stopped Speaking");
                     break;
                 }
                 const message = new SpeechSynthesisUtterance(document.body.innerText.slice(0,1000));
                 speechSynthesis.speak(message);
                 console.log("Start speaking");
+                show_feedback(gesture, "Start Speaking");
                 break;
             case '[' : 
                 if (window.reader) {
                     deactivate_reader();
                     console.log("Reader mode deactivated");
+                    show_feedback(gesture, "Reader Mode Deactivated");
                     window.reader = false;
                     break;
                 }
                 reader_mode();
                 console.log("Reader mode activated");
+                show_feedback(gesture, "Reader Mode Activated");
                 window.reader = true;
                 break;
             default : 
@@ -135,35 +149,68 @@ if (!document.getElementById("gesture_canvas")) {
             mainContent = document.body.cloneNode(true);
         }
     
-        document.body.innerHTML = ''; 
-        document.body.appendChild(mainContent);
-    
-        Object.assign(document.body.style, {
-            margin: '0',
-            padding: '0',
+        const overlay = document.createElement('div');
+        overlay.id = 'reader_overlay';
+        Object.assign(overlay.style, {
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            overflowY: 'auto',
             backgroundColor: '#fefefe',
+            zIndex: 10000,
+            padding: '2em',
             fontFamily: 'Georgia, serif',
-            lineHeight: '1.6',
             fontSize: '18px',
             color: '#222',
         });
     
         Object.assign(mainContent.style, {
-            margin: '2em auto',
             maxWidth: '700px',
+            margin: '2em auto',
             backgroundColor: '#fff',
             padding: '2em',
             boxShadow: '0 0 10px rgba(0,0,0,0.1)',
         });
+    
+        overlay.appendChild(mainContent);
+        document.body.appendChild(overlay);
     }
+    
 
     // deactivate reader mode
     function deactivate_reader() {
-        location.reload();
+        const overlay = document.getElementById('reader_overlay');
+        if (overlay) overlay.remove();
     }
     
     // close canvas
     function cleanup() {
         canvas.remove();
     }
+
+    // shows feedback 
+    function show_feedback(gesture, text) {
+        const feedback = document.createElement('div');
+        if (gesture == 'none') feedback.textContent = text;
+        else feedback.textContent = `Gesture: ${gesture} Detected → ${text}`;
+        Object.assign(feedback.style, {
+            position: 'fixed',
+            bottom: '10px',
+            right: '10px',
+            background: 'rgba(0,0,0,0.8)',
+            color: 'white',
+            padding: '10px 15px',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontFamily: 'monospace',
+            zIndex: 10001,
+            boxShadow: '0 0 10px rgba(0,0,0,0.2)',
+        });
+    
+        document.body.appendChild(feedback);
+        setTimeout(() => feedback.remove(), 2500); 
+    }
+    
 }
