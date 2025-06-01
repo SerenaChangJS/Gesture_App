@@ -26,6 +26,49 @@ else if (!document.getElementById("gesture_canvas")) {
 
     document.body.appendChild(canvas);
 
+    let gesture_list_box = document.createElement('div');
+    gesture_list_box.id = "gesture_list_box";
+    gesture_list_box.innerHTML = `
+        <table style="
+            font-family: monospace;
+            font-size: 14px;
+            background-color: rgba(64, 64, 64, 1.0);
+            color: white;
+            border: 1px solid #888;
+            border-collapse: collapse;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 10000;
+        ">
+            <thead>
+                <tr>
+                    <th style="border: 1px solid #888; padding: 6px;">Gesture</th>
+                    <th style="border: 1px solid #888; padding: 6px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="border: 1px solid #888; padding: 6px;">o</td>
+                    <td style="border: 1px solid #888; padding: 6px;">Zoom In</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #888; padding: 6px;">[</td>
+                    <td style="border: 1px solid #888; padding: 6px;">Reader Mode</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #888; padding: 6px;">]</td>
+                    <td style="border: 1px solid #888; padding: 6px;">Text-to-Speech</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #888; padding: 6px;">Esc Key</td>
+                    <td style="border: 1px solid #888; padding: 6px;">Cancel All</td>
+                </tr>
+            </tbody>
+        </table>
+    `;
+    document.body.appendChild(gesture_list_box);
+
     let context = canvas.getContext("2d");
     context.strokeStyle = 'black';
     context.lineWidth = 2;
@@ -188,6 +231,8 @@ else if (!document.getElementById("gesture_canvas")) {
     // close canvas
     function cleanup() {
         canvas.remove();
+        const gesture_box = document.getElementById('gesture_list_box');
+        if (gesture_box) gesture_box.remove();
     }
 
     // shows feedback 
