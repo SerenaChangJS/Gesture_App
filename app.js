@@ -29,18 +29,23 @@ else if (!document.getElementById("gesture_canvas")) {
     let gesture_list_box = document.createElement('div');
     gesture_list_box.id = "gesture_list_box";
     gesture_list_box.innerHTML = `
-        <table style="
-            font-family: monospace;
-            font-size: 14px;
-            background-color: rgba(64, 64, 64, 1.0);
-            color: white;
-            border: 1px solid #888;
-            border-collapse: collapse;
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 10000;
-        ">
+    <div style="
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 10000;
+    background-color: rgba(64, 64, 64, 1.0);
+    padding: 5px;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+">
+    <table style="
+        font-family: monospace;
+        font-size: 14px;
+        color: white;
+        border: 1px solid #888;
+        border-collapse: collapse;
+    ">
             <thead>
                 <tr>
                     <th style="border: 1px solid #888; padding: 6px;">Gesture</th>
@@ -239,7 +244,7 @@ else if (!document.getElementById("gesture_canvas")) {
     function show_feedback(gesture, text) {
         const feedback = document.createElement('div');
         if (gesture == 'none') feedback.textContent = text;
-        else feedback.textContent = `Gesture: ${gesture} Detected → ${text}`;
+        else feedback.textContent = `Gesture '${gesture}' Detected → ${text}`;
         Object.assign(feedback.style, {
             position: 'fixed',
             bottom: '10px',

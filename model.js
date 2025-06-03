@@ -76,6 +76,11 @@ function extractFeatures (coords){
     start_angle = Math.atan2(start_dy, start_dx)
     end_angle = Math.atan2(end_dy, end_dx)
 
+    // find center of x
+    x_center = x_coords.reduce((a, b) => a + b, 0) / x_coords.length
+    x_range = Math.max(...x_coords) - Math.min(...x_coords)
+    x_normalized_center = (x_center-Math.min(...x_coords))/x_range
+
     // add all imp info to X
     return [
         path_len, 
@@ -89,12 +94,13 @@ function extractFeatures (coords){
         bbox_h, 
         bbox_ratio, 
         start_angle, 
-        end_angle
+        end_angle, 
+        x_normalized_center
     ];
 }
 
 function model_classify(input, k=3){
-    selected_feature = [0, 1, 3, 4, 6, 11] // got from DecisionTree.py's output
+    selected_feature = [1,9,12] // got from DecisionTree.py's output
     selected_extracted_feature = []
     selected_feature.forEach((i) =>{
         selected_extracted_feature.push(input[i]);
