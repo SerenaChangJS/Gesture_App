@@ -1,6 +1,6 @@
 {
     "manifest_version" : 3,
-    "name" : "Gesture AI App",
+    "name" : "Gesture Browser",
     "version" : "1.0",
     "description" : "Control browser with gestures. (Gesture recognition by AI.) NOTE : Click Shift+OPT+G to enable tool.",
     "permissions" : ["commands", "activeTab", "scripting"],

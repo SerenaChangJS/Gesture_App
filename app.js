@@ -1,3 +1,4 @@
+// "global" variables
 if (typeof window.zoomed === 'undefined') {
     window.zoomed = false;
 }
@@ -6,7 +7,7 @@ if (typeof window.reader === 'undefined') {
 }
 
 if (window.reader) {
-    show_feedback('none', "Exit Reader Mode to Reopen Canvas");
+    show_feedback('none', "Exit Reader Mode to Reopen Canvas"); // user tries to open on reader mode
 } 
 else if (!document.getElementById("gesture_canvas")) {
     let canvas = document.createElement('canvas');
@@ -26,6 +27,7 @@ else if (!document.getElementById("gesture_canvas")) {
 
     document.body.appendChild(canvas);
 
+    // gesture actions table
     let gesture_list_box = document.createElement('div');
     gesture_list_box.id = "gesture_list_box";
     gesture_list_box.innerHTML = `
@@ -100,7 +102,7 @@ else if (!document.getElementById("gesture_canvas")) {
         drawing = true;
         points = [[e.clientX, e.clientY]];
         context.beginPath();
-        context.moveTo(e.clientX, e.clientY);
+        context.moveTo(e.clientX, e.clientY); // draw gesture's path
         console.log("Start drawing");
     })
 
@@ -108,21 +110,22 @@ else if (!document.getElementById("gesture_canvas")) {
     canvas.addEventListener("mousemove", (e) => {
         if (!drawing) return;
         points.push([e.clientX, e.clientY]);
-        context.lineTo(e.clientX, e.clientY);
+        context.lineTo(e.clientX, e.clientY); // draw gesture's path
         context.stroke();
     })
 
     // mouse up = finish drawing + gesture recognition
     canvas.addEventListener("mouseup", async () => {
         drawing = false;
-        context.closePath();
+        context.closePath(); // stop drawing gesture's path
 
         console.log("Stop drawing");
         console.log("Start classification");
 
+        // check if enough coordinates
         if (points.length>5) {
-            const features = extractFeatures(points);
-            const gesture = model_classify(features);
+            const features = extractFeatures(points); // extract features to pass as argument later
+            const gesture = model_classify(features); // call model to classify gesture
             console.log("Classification finished : ", gesture);
             browser_action(gesture);
             cleanup();
@@ -137,6 +140,7 @@ else if (!document.getElementById("gesture_canvas")) {
     function browser_action(gesture){
         switch(gesture){
             case 'o':
+                // cancel action 
                 if (window.zoomed){
                     document.body.style.zoom = "100%";
                     console.log("Zoomed out");
@@ -144,24 +148,28 @@ else if (!document.getElementById("gesture_canvas")) {
                     window.zoomed = false;
                     break;
                 }
+                // do action
                 document.body.style.zoom = "120%";
                 console.log("Zoomed in");
                 show_feedback(gesture, "Zoomed In");
                 window.zoomed = true;
                 break;
             case ']' : 
+                // cancel action
                 if (speechSynthesis.speaking) {
                     speechSynthesis.cancel();
                     console.log("Stopped speaking");
                     show_feedback(gesture, "Stopped Speaking");
                     break;
                 }
+                // do action
                 const message = new SpeechSynthesisUtterance(document.body.innerText.slice(0,1000));
                 speechSynthesis.speak(message);
                 console.log("Start speaking");
                 show_feedback(gesture, "Start Speaking");
                 break;
             case '[' : 
+                // cancel action (prob won't be called since canvas can't be opened on reader)
                 if (window.reader) {
                     deactivate_reader();
                     console.log("Reader mode deactivated");
@@ -169,6 +177,7 @@ else if (!document.getElementById("gesture_canvas")) {
                     window.reader = false;
                     break;
                 }
+                // do action
                 reader_mode();
                 console.log("Reader mode activated");
                 show_feedback(gesture, "Reader Mode Activated");
@@ -181,6 +190,7 @@ else if (!document.getElementById("gesture_canvas")) {
 
     // activated reader mode
     function reader_mode() {
+        // collect content
         const selectors = ['article', 'main', '#content', '.content'];
         let mainContent = null;
     
@@ -197,6 +207,7 @@ else if (!document.getElementById("gesture_canvas")) {
             mainContent = document.body.cloneNode(true);
         }
     
+        // setting
         const overlay = document.createElement('div');
         overlay.id = 'reader_overlay';
         Object.assign(overlay.style, {
@@ -222,6 +233,7 @@ else if (!document.getElementById("gesture_canvas")) {
             boxShadow: '0 0 10px rgba(0,0,0,0.1)',
         });
     
+        // display
         overlay.appendChild(mainContent);
         document.body.appendChild(overlay);
     }
@@ -242,6 +254,7 @@ else if (!document.getElementById("gesture_canvas")) {
 
     // shows feedback 
     function show_feedback(gesture, text) {
+        // settings
         const feedback = document.createElement('div');
         if (gesture == 'none') feedback.textContent = text;
         else feedback.textContent = `Gesture '${gesture}' Detected → ${text}`;
@@ -258,7 +271,7 @@ else if (!document.getElementById("gesture_canvas")) {
             zIndex: 10001,
             boxShadow: '0 0 10px rgba(0,0,0,0.2)',
         });
-    
+        // display
         document.body.appendChild(feedback);
         setTimeout(() => feedback.remove(), 2500); 
     }

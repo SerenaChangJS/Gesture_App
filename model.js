@@ -1,4 +1,5 @@
 function extractFeatures (coords){
+    // vars
     let path_len = 0;
     let angles = [];
     let half_angles = [];
@@ -10,6 +11,7 @@ function extractFeatures (coords){
     // prep for extracting features
     for (let i = 1; i<coords.length; i++) {
 
+        // less than two coordinates (cancel drawing board)
         if (coords.length <2){
             console.error("Error : extractFeatures (Invalid or too few coords)");
             return new Array(10).fill(0);
@@ -41,6 +43,7 @@ function extractFeatures (coords){
             if (delta_theta > Math.PI) delta_theta -= 2 * Math.PI;
             else if (delta_theta < -Math.PI) delta_theta += 2 * Math.PI;
             angles.push(delta_theta);
+            // only add half of coordinates
             if (i < Math.floor(coords.length / 2)) {
                 half_angles.push(delta_theta);
             }
@@ -100,7 +103,7 @@ function extractFeatures (coords){
 }
 
 function model_classify(input, k=3){
-    selected_feature = [1,9,12] // got from DecisionTree.py's output
+    selected_feature = [1,9,12] // combination of highest accuracy computed by model
     selected_extracted_feature = []
     selected_feature.forEach((i) =>{
         selected_extracted_feature.push(input[i]);

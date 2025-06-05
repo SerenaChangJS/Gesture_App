@@ -2,8 +2,7 @@ function classification(input) {
 
     var var0;
 
-    // find highest probability
-    
+    // tree outputted by decision_tree.py
     if (input[0] <= 91.62751770019531) {
         if (input[2] <= 0.6903620064258575) {
             var0 = [0.0, 0.0, 1.0];
@@ -50,16 +49,13 @@ function classification(input) {
         }
     }
 
-    console.log(var0)
-
+    // find gesture with max probability
     const classes = ['[', ']', 'o'];
     let maxIndex = 0;
     for (let i=1; i<var0.length; i++){
         if (var0[i] > var0[maxIndex]) maxIndex = i;
     }
 
-    console.log(var0);
-    console.log(maxIndex)
-
+    // output gesture
     return classes[maxIndex];
 }
